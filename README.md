@@ -15,3 +15,22 @@ This is a very simple extension that you can customize for your needs.
 * Modify the css file.
 * Reload the extension from `chrome://extensions/`
 
+
+
+# Safari
+The extension only uses `content_scripts` (no `chrome.*` APIs), so it runs as a Safari Web Extension without code changes. Packaging requires macOS with Xcode.
+
+* Generate an Xcode project (files are referenced, not copied, so edits in this repo still apply after a rebuild):
+  ```
+  xcrun safari-web-extension-converter /path/to/css-override-chrome-extension \
+    --app-name "CSS Override" \
+    --bundle-identifier com.example.cssoverride \
+    --macos-only
+  ```
+  Omit `--macos-only` to also get an iOS target.
+* Build and run in Xcode (⌘R). This launches the container app that installs the extension.
+* In Safari, enable Settings › Advanced › "Show features for web developers".
+* In Settings › Developer, check "Allow unsigned extensions" (it resets every time Safari restarts; sign the app with your Apple ID under Signing & Capabilities to avoid this).
+* In Settings › Extensions, enable "CSS Override".
+* Grant the extension access to the site when prompted ("Always Allow on This Website"), otherwise the CSS is not injected.
+* After editing the css or `manifest.json`, rebuild in Xcode.
