@@ -1,8 +1,8 @@
 {
     "manifest_version": 3,
-    "name": "CSS Override",
-    "description": "Customize CSS for certain sites",
-    "version": "1.0.1",
+    "name": "Globo sem Ruído",
+    "description": "Hides noisy sections of globo.com, such as sports",
+    "version": "1.0.2",
     "browser_specific_settings": {
         "gecko": {
             "id": "css-override@tiagovignatti",
