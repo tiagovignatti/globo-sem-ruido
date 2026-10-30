@@ -1,57 +1,29 @@
-This extension hides noisy sections of globo.com (currently sports) by overriding its CSS. The same approach works for any other site.
+# Globo sem Ruído
+
+Hides noisy sections of [globo.com](https://www.globo.com) (currently sports). It's just CSS: no tracking, no data collection.
 
 I wrote it because the extensions I found on the Chrome Web Store either didn't work or engaged in dubious activity.
 
-This is a very simple extension that you can customize for your needs.
+## Install
 
+**Firefox:** download the `.xpi` from the [latest release](https://github.com/tiagovignatti/globo-sem-ruido/releases/latest), open `about:addons`, click the gear › "Install Add-on From File…" and pick it.
 
-# Install
-* Open `chrome://extensions/` in the address bar.
-* Enable "Developer mode" toggle in top right.
-* Click on "Load unpacked"
+**Chrome:** clone this repo, open `chrome://extensions`, turn on "Developer mode", click "Load unpacked" and pick the folder.
 
-# Customizing
-* Edit `manifest.json` to assing a css file to the website of your choice.
-* Modify the css file.
-* Reload the extension from `chrome://extensions/`
+**Safari** (macOS with Xcode): from the repo folder, run
+```
+xcrun safari-web-extension-converter . --app-name "Globo sem Ruído" \
+  --bundle-identifier com.example.globosemruido --macos-only
+```
+and run the project in Xcode (⌘R). In Safari, enable Settings › Advanced › "Show features for web developers", then Settings › Developer › "Allow unsigned extensions" (resets on restart), turn the extension on in Settings › Extensions, and allow it on globo.com when asked.
 
+## Customize
 
+The hidden sections are CSS rules in `content_script.css`, and `manifest.json` sets which sites they apply to.
 
-# Safari
-The extension only uses `content_scripts` (no `chrome.*` APIs), so it runs as a Safari Web Extension without code changes. Packaging requires macOS with Xcode.
-
-* Generate an Xcode project (files are referenced, not copied, so edits in this repo still apply after a rebuild):
-  ```
-  xcrun safari-web-extension-converter /path/to/globo-sem-ruido \
-    --app-name "Globo sem Ruído" \
-    --bundle-identifier com.example.globosemruido \
-    --macos-only
-  ```
-  Omit `--macos-only` to also get an iOS target.
-* Build and run in Xcode (⌘R). This launches the container app that installs the extension.
-* In Safari, enable Settings › Advanced › "Show features for web developers".
-* In Settings › Developer, check "Allow unsigned extensions" (it resets every time Safari restarts; sign the app with your Apple ID under Signing & Capabilities to avoid this).
-* In Settings › Extensions, enable "Globo sem Ruído".
-* Grant the extension access to the site when prompted ("Always Allow on This Website"), otherwise the CSS is not injected.
-* After editing the css or `manifest.json`, rebuild in Xcode.
-
-
-
-# Firefox
-Release Firefox only installs signed add-ons, so the extension is signed as *unlisted* on addons.mozilla.org (AMO): Mozilla signs it but does not publish it. The `browser_specific_settings.gecko` block in `manifest.json` holds the add-on ID and data collection declaration that signing requires; Chrome ignores it with an "Unrecognized manifest key" warning.
-
-* To try changes, run the extension in a separate profile that reloads it whenever a file changes:
-  ```
-  npx web-ext run \
-    --firefox-profile ~/snap/firefox/common/web-ext-profile \
-    --profile-create-if-missing --keep-profile-changes \
-    --start-url https://ge.globo.com
-  ```
-  The profile path is needed for the Ubuntu snap of Firefox, which cannot read the `/tmp` profile `web-ext` uses by default. With other Firefox installs, plain `npx web-ext run` works.
-* To install permanently, create API credentials at https://addons.mozilla.org/developers/addon/api/key/ and sign:
-  ```
-  WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npx web-ext sign --channel=unlisted
-  ```
-  The signed `.xpi` lands in `web-ext-artifacts/`.
-* In `about:addons`, click the gear › "Install Add-on From File…" and pick the `.xpi`.
-* After editing the css or `manifest.json`, bump `version` in `manifest.json` (AMO will not sign a version twice), sign again and install the new `.xpi` over the old one.
+To ship a change to Firefox, bump `version` in `manifest.json` and sign it with your [AMO API keys](https://addons.mozilla.org/developers/addon/api/key/):
+```
+npx web-ext run                        # try it in a temporary profile
+WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npx web-ext sign --channel=unlisted
+```
+The signed `.xpi` lands in `web-ext-artifacts/`. With the Ubuntu snap of Firefox, add `--firefox-profile ~/snap/firefox/common/web-ext-profile --profile-create-if-missing --keep-profile-changes` to `web-ext run`, because the snap can't read the default profile in `/tmp`.
