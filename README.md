@@ -34,3 +34,24 @@ The extension only uses `content_scripts` (no `chrome.*` APIs), so it runs as a 
 * In Settings › Extensions, enable "CSS Override".
 * Grant the extension access to the site when prompted ("Always Allow on This Website"), otherwise the CSS is not injected.
 * After editing the css or `manifest.json`, rebuild in Xcode.
+
+
+
+# Firefox
+Release Firefox only installs signed add-ons, so the extension is signed as *unlisted* on addons.mozilla.org (AMO): Mozilla signs it but does not publish it. The `browser_specific_settings.gecko` block in `manifest.json` holds the add-on ID and data collection declaration that signing requires; Chrome ignores it with an "Unrecognized manifest key" warning.
+
+* To try changes, run the extension in a separate profile that reloads it whenever a file changes:
+  ```
+  npx web-ext run \
+    --firefox-profile ~/snap/firefox/common/web-ext-profile \
+    --profile-create-if-missing --keep-profile-changes \
+    --start-url https://ge.globo.com
+  ```
+  The profile path is needed for the Ubuntu snap of Firefox, which cannot read the `/tmp` profile `web-ext` uses by default. With other Firefox installs, plain `npx web-ext run` works.
+* To install permanently, create API credentials at https://addons.mozilla.org/developers/addon/api/key/ and sign:
+  ```
+  WEB_EXT_API_KEY=... WEB_EXT_API_SECRET=... npx web-ext sign --channel=unlisted
+  ```
+  The signed `.xpi` lands in `web-ext-artifacts/`.
+* In `about:addons`, click the gear › "Install Add-on From File…" and pick the `.xpi`.
+* After editing the css or `manifest.json`, bump `version` in `manifest.json` (AMO will not sign a version twice), sign again and install the new `.xpi` over the old one.
