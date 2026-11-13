@@ -16,7 +16,7 @@
             "matches": ["https://*.globo.com/*"],
             "css": ["content_script.css"],
             "js": ["content_script.js"],
-            "run_at": "document_end"
+            "run_at": "document_start"
         }
     ]
 }
